@@ -1,31 +1,32 @@
 # audio-visualizer
+Fork from original https://terminalroot.com.br/2024/12/como-criar-um-visualizador-de-Audio-com-cpp.html
+
 Audio Spectrum with SFML and FFTW
 
-![Audio Spectrum](./audio-spectrum.png) 
 
 ---
 
 ## Dependencies
-+ C++ compiler: [GNU GCC](https://gcc.gnu.org/)/[Clang](https://clang.llvm.org/)/[MSVC](https://visualstudio.microsoft.com/)
++ C++ compiler: [GNU GCC](https://gcc.gnu.org/)
 + [SFML](https://www.sfml-dev.org/)
 + [FFTW](https://fftw.org/)
 
-Example of installing FFTW on Ubuntu:
+Example of installing FFTW on Fedora:
 ```bash
-sudo apt update
-sudo apt install libfftw3-dev
+run0 dnf install fftw-devel
 ```
 
 ---
 
 ## Compile and run
 ```bash
-git clone https://github.com/terroo/audio-visualizer
-cd audio-visualizer
-g++ main.cpp -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lfftw3 
-./a.out Music.mp3
+make
+./audio_pl Music.mp3
 ```
 
 ---
-
-Watch the video: <https://youtu.be/04c8YR7dhP4>
+## Changes from original:
+- volume control
+- audio progress bar
+- comments included in the source code
+- make file
