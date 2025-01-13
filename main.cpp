@@ -16,6 +16,7 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+#include "nfd/include/nfd.h"
 
 int main (int argc, char** argv){
   sf::Color gray(128, 128, 128); //Define uma cor cinza de intensidade média
@@ -31,30 +32,45 @@ int main (int argc, char** argv){
   auto [winWidth, winHeight] = windowSize;
 
   //Verifica se foi passado o nome do arquivo de audio
+
+  nfdchar_t *filepath = NULL;
   if (argc < 2){
-    std::cerr << "Modo de uso: " << argv[0] << "arquivo.[mp3|wav|ogg]" << std::endl;
-    return EXIT_FAILURE;
+    nfdresult_t result = NFD_OpenDialog( "mp3,wav,ogg", ".", &filepath);
+    if (result != NFD_OKAY){
+      std::cerr << "Selecione um arquivo ou execute no modo: " << argv[0] << "arquivo.[mp3|wav|ogg]" << std::endl;
+      return EXIT_FAILURE;
+    }
   }
-  
+  else {
+    filepath = argv[1]; 
+  }
   //Verifica se o arquivo existe
   sf::SoundBuffer buffer;
-  if(!buffer.loadFromFile(argv[1])){
+  if(!buffer.loadFromFile(filepath)){
     std::cerr << "Falha ao carregar o arquivo " << argv[1] << std::endl;
     return EXIT_FAILURE;
   }
 
+  
   //Cria o texto com o nome do arquivo sem a extensão para ser exibido no canto superior direito
   sf::Font font;
   font.loadFromFile("./NotoSansMath-Regular.ttf");
-  std::string music = argv[1];
-  size_t pos = music.find_last_of('.');
-  if (pos != std::string::npos) {
-    music = music.substr(0, pos);
+  std::string music (filepath);
+  size_t pos1 = music.find_last_of('/');
+  size_t pos2 = music.find_last_of('.');
+  if (pos1 == std::string::npos){
+    pos1 = 0;
+  }
+  else{
+    pos1++;
+  }
+
+  if (pos2 != std::string::npos) {
+    music = music.substr(pos1, pos2 - pos1);
   }
   sf::Text text(music, font, 18);
   text.setPosition(20.f, 10.f);
-
-
+  
   //Cria um slide para controlar o volume do audio
   sf::RectangleShape slideBar (sf::Vector2f(400.f, 10.f));
   slideBar.setFillColor(sf::Color::White);
@@ -162,7 +178,6 @@ int main (int argc, char** argv){
 
     // Exibir a duração em segundos
     current_sample += sample_size;
-
     window->clear();
 
     //Cria e exibe as barras do espectro no lado direito
@@ -212,6 +227,9 @@ int main (int argc, char** argv){
   fftw_destroy_plan(plan);
   fftw_free(in);
   fftw_free(out);
+  if (argc < 2 && filepath) {
+    free(filepath);  // Libera memória alocada pelo NFD
+  }
 
   //encerra
   return EXIT_SUCCESS;
